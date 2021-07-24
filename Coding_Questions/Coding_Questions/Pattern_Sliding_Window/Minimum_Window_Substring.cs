@@ -10,58 +10,108 @@ namespace Coding_Questions.Pattern_Sliding_Window
     {
         public void Start()
         {
-
-            string inputString = "aabdec";
+            string inputString = "abdabca";
             string pattern = "abc";
+
+
+            var requiredCharacters = BuildMappingOfCharactersToOccurences(pattern);
+            var windowCharacterMapping = new Dictionary<char, int>();
 
             int left = 0;
             int right = 0;
 
-            //Find Ideal Window size containing pattern
+            int totalCharFrequenciesToMatch = requiredCharacters.Count;
+            int charFrequenciesInWindowThatMatch = 0;
 
-            int[] patternHash = new int[26];
-            int p = 0;
-            while(p < pattern.Length)
-            {
-                patternHash[pattern[p] - 'a']++;
-                p++;
-            }
+            int minimumWindowLengthSeenSoFar = Int32.MaxValue;
 
-            int[] inputStringHash = new int[26];
-            int pLen = 0;
-            bool patternNotMatched = false;
+            string minWindow = string.Empty;
 
             while(right < inputString.Length)
             {
-                patternNotMatched = true;
+                char characterAtRightPointer = inputString[right];
+                AddCharacterToHashTableMapping(windowCharacterMapping, characterAtRightPointer);
 
-                //Find window size containing the pattern then optimize
-                inputStringHash[inputString[right] - 'a']++;
-
-                //After each addition, verify if we have covered all chars in input pattern
-                pLen = 0;
-                while(pLen < pattern.Length)
+                bool rightCharIsARequirement = requiredCharacters.ContainsKey(characterAtRightPointer);
+                if(rightCharIsARequirement)
                 {
-                    if (inputStringHash[pattern[pLen] - 'a'] == 0)
+                    bool requirementForCharacterMet = requiredCharacters[characterAtRightPointer]
+                        == windowCharacterMapping[characterAtRightPointer];
+
+                    if (requirementForCharacterMet)
+                        charFrequenciesInWindowThatMatch++;
+                }
+
+                while(charFrequenciesInWindowThatMatch == totalCharFrequenciesToMatch && left <= right)
+                {
+                    char characterAtLeftPointer = inputString[left];
+                    int windowSize = right - left + 1;
+
+                    if(windowSize < minimumWindowLengthSeenSoFar)
                     {
-                        patternNotMatched = false;
-                        break;
+                        minimumWindowLengthSeenSoFar = windowSize;
+                        minWindow = inputString.Substring(left, right + 1 - left);
                     }
-                    pLen++;
+
+                    windowCharacterMapping[characterAtLeftPointer] = windowCharacterMapping[characterAtLeftPointer] - 1;
+
+                    bool leftCharIsARequirement = requiredCharacters.ContainsKey(characterAtLeftPointer);
+                    if(leftCharIsARequirement)
+                    {
+                        bool characterFailsRequirement = windowCharacterMapping[characterAtLeftPointer]
+                            < requiredCharacters[characterAtLeftPointer];
+
+                        if (characterFailsRequirement)
+                            charFrequenciesInWindowThatMatch--;
+                    }
+
+                    left++;
                 }
 
-                if(!patternNotMatched)
-                {
-                    right++;
-                }
-
+                right++;
             }
+
+
+
 
         }
 
 
+        private Dictionary<char,int> BuildMappingOfCharactersToOccurences(string s)
+        {
+            var map = new Dictionary<char, int>();
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                int occurencesOfChars = 0;
+                if(map.ContainsKey(s[i]))
+                {
+                    occurencesOfChars = map[s[i]];
+                }
+                map[s[i]] = occurencesOfChars + 1;
+            }
+
+            return map;
+        }
+
+
+        private void AddCharacterToHashTableMapping(Dictionary<char,int> map,char c)
+        {
+            int occurences = 0;
+            if(map.ContainsKey(c))
+            {
+                occurences = map[c];
+            }
+
+            map[c] = occurences + 1;
+        }
+
+
+
+
         /*
-          Given a string and a pattern, find the smallest substring in the given string which has all the characters of the given pattern.
+          Given a string and a pattern, find the smallest substring in the given string which has all 
+          the characters of the given pattern.
             Example 1:
             Input: String="aabdec", Pattern="abc"
             Output: "abdec"

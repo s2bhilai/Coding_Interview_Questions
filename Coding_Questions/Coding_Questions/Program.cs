@@ -7,7 +7,7 @@ namespace Coding_Questions
     {
         static void Main(string[] args)
         {
-            string_anagram frt = new string_anagram();
+            Smallest_SubArray_Given_Sum frt = new Smallest_SubArray_Given_Sum();
             frt.Start();
 
             Console.ReadLine();
