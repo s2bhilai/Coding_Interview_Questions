@@ -1,4 +1,5 @@
 ﻿using Coding_Questions.Pattern_Sliding_Window;
+using Coding_Questions.Pattern_Two_Pointers;
 using System;
 
 namespace Coding_Questions
@@ -7,7 +8,7 @@ namespace Coding_Questions
     {
         static void Main(string[] args)
         {
-            Smallest_SubArray_Given_Sum frt = new Smallest_SubArray_Given_Sum();
+            Triplet_Sum_Zero frt = new Triplet_Sum_Zero();
             frt.Start();
 
             Console.ReadLine();
